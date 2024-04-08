@@ -2,7 +2,7 @@ import { LifecycleHooks } from "../constant";
 
 type LifecycleHook<TFn = Function> = TFn[] | null
 
-export interface ComponentContext {
+export interface ComponentTarget {
   [LifecycleHooks.BEFORE_RENDER]: LifecycleHook;
   [LifecycleHooks.RENDERED]: LifecycleHook;
   [LifecycleHooks.BEFORE_UPDATE]: LifecycleHook;
@@ -11,7 +11,7 @@ export interface ComponentContext {
   [LifecycleHooks.UNMOUNTED]: LifecycleHook;
 }
 
-export function createComponentContext(): ComponentContext {
+export function createComponentComponentTarget(): ComponentTarget {
   return {
     [LifecycleHooks.BEFORE_RENDER]: null,
     [LifecycleHooks.RENDERED]: null,
