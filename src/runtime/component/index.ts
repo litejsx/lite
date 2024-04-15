@@ -1,16 +1,24 @@
 import type { Props } from "../index";
-import type { ComponentTarget } from "./componentTarget";
+import { createComponentcomponentContext, pushComponentContext, popComponentContext, getComponentContext } from "./componentContext";
+import { callUnstableFunc } from "../../utils";
+import { callHook, LifecycleHooks } from "./lifecycle";
 
-export type Component = (init?: Record<string, unknown>) => Element | null;
+export { getComponentContext } from './componentContext';
+export type { ComponentContext } from './componentContext';
+export { onBeforeRender, onRendered, onBeforeUpdate, onUpdated, onUnmounted } from './lifecycle'
 
-const componentTarget: ComponentTarget | null = null;
+export type Component = (init: Record<string, unknown>, ctx: Record<string, unknown>) => Element | Text | null;
 
-export function createComponent(component: Component, props?: Props | null) {
-  let el: Element | null = null;
-  try {
-    el = component(props ?? {});
-  } catch (err) {
-    el = null;
-  }
-  return el
+export function createComponent(component: Component, props: Props) {
+  const ctx = createComponentcomponentContext();
+  
+  pushComponentContext(ctx);
+  const el = callUnstableFunc<Component>(component, [props, {}]);
+  popComponentContext();
+  const parentComponent = getComponentContext();
+  parentComponent?.subComponents.push(ctx);
+
+  callHook(LifecycleHooks.RENDERED, ctx);
+
+  return el;
 }
